@@ -1669,6 +1669,38 @@ void CheckClass::virtualDestructorError(const Token *tok, const std::string &Bas
                     "could leak. This can be avoided by adding a virtual destructor to the base class.", ErrorLogger::GenWebIdentity(Base));
 }
 
+void CheckClass::virtualDestructorX51()
+{
+    std::list<const Scope *> inconclusive_errors;
+
+    const std::size_t classes = symbolDatabase->classAndStructScopes.size();
+    for (std::size_t i = 0; i < classes; ++i) {
+        const Scope * scope = symbolDatabase->classAndStructScopes[i];
+
+        // Skip base classes (unless inconclusive)
+        if (scope->definedType->derivedFrom.empty()) {
+            const Function *destructor = scope->getDestructor();
+            if (!destructor || !destructor->isVirtual()) {
+                std::list<Function>::const_iterator func;
+                for (func = scope->functionList.begin(); func != scope->functionList.end(); ++func) {
+                    if (func->isVirtual()) {
+                        inconclusive_errors.push_back(scope);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    for (std::list<const Scope *>::const_iterator i = inconclusive_errors.begin(); i != inconclusive_errors.end(); ++i)
+        virtualDestructorErrorX51((*i)->classDef, (*i)->className, "");
+}
+
+void CheckClass::virtualDestructorErrorX51(const Token *tok, const std::string &Base, const std::string &Derived)
+{
+        reportError(tok, Severity::warning, ErrorType::MemoryLeak, "virtualDestructor", "Class '" + Base + "' which has virtual members does not have a virtual destructor.", 0U, true, ErrorLogger::GenWebIdentity(Base));
+}
+
 //---------------------------------------------------------------------------
 // warn for "this-x". The indented code may be "this->x"
 //---------------------------------------------------------------------------

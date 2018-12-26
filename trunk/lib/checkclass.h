@@ -64,6 +64,7 @@ public:
 
         // Coding style checks
 		checkClass.virtualDestructor();
+        checkClass.virtualDestructorX51();
 		checkClass.constructors();
 #ifdef TSCANCODE_RULE_OPEN
        
@@ -119,6 +120,7 @@ public:
 
     /** @brief The destructor in a base class should be virtual */
     void virtualDestructor();
+    void virtualDestructorX51();
 
     /** @brief warn for "this-x". The indented code may be "this->x"  */
     void thisSubtraction();
@@ -162,6 +164,7 @@ private:
     void mallocOnClassWarning(const Token* tok, const std::string &memfunc, const Token* classTok);
     void operatorEqReturnError(const Token *tok, const std::string &className);
     void virtualDestructorError(const Token *tok, const std::string &Base, const std::string &Derived, bool inconclusive);
+    void virtualDestructorErrorX51(const Token *tok, const std::string &Base, const std::string &Derived);
     void thisSubtractionError(const Token *tok);
     void operatorEqRetRefThisError(const Token *tok);
     void operatorEqShouldBeLeftUnimplementedError(const Token *tok);
